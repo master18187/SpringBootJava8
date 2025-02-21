@@ -47,6 +47,7 @@ public class KafkaClusterConsumerConfig {
     }
 
     public static class CustomPartitioner implements Partitioner {
+        
     @Override
     public int partition(String topic, Object key, byte[] keyBytes, 
                         Object value, byte[] valueBytes, Cluster cluster) {
