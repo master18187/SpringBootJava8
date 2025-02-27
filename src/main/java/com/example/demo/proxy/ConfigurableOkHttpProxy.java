@@ -45,10 +45,10 @@ public class ConfigurableOkHttpProxy {
                 .build();
 
         // 启动代理服务器
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(18080), 0);
         server.createContext("/", exchange -> handleRequest(exchange));
         server.start();
-        System.out.println("Configurable Proxy running on port 8080");
+        System.out.println("Configurable Proxy running on port 18080");
     }
 
     // 路由配置加载（支持 YAML）
