@@ -81,7 +81,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- SLF4J Aadpter -->
+		<!-- SLF4J Adapter -->
 		<!--日志门面-->
 		<dependency>
 			<groupId>org.slf4j</groupId>
