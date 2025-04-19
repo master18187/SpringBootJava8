@@ -1,0 +1,19 @@
+
+spring:
+  main:
+    allow-circular-references: true # 允许循环依赖
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/app?useSSL=false&characterEncoding=utf8
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  # 映射文件扫描路径（XML 文件）
+  mapper-locations: classpath:mapper/**/*.xml
+  # 实体类包扫描路径（别名配置）
+  # type-aliases-package: com.example.entity
+  # 开启驼峰命名映射（user_name → userName）
+  configuration:
+    map-underscore-to-camel-case: true
