@@ -91,9 +91,15 @@ public class DynamicServiceProvider implements InitializingBean, BeanFactoryAwar
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         this.beanFactory = (AutowireCapableBeanFactory) beanFactory;
-        this.beanFactoryInstance = (AbstractAutowireCapableBeanFactory) beanFactory;
+        if (beanFactory instanceof AbstractAutowireCapableBeanFactory) {
+            this.beanFactoryInstance = (AbstractAutowireCapableBeanFactory) beanFactory;
+        }
+        if (beanFactory instanceof BeanDefinitionRegistry) {
+            this.beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
+        }
+        if (beanFactory instanceof SingletonBeanRegistry) {
+            this.singletonBeanRegistry = (SingletonBeanRegistry) beanFactory;
+        }
 
-        this.beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
-        this.singletonBeanRegistry = (SingletonBeanRegistry) beanFactory;
     }
 }

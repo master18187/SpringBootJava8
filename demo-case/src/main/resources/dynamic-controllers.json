@@ -1,0 +1,12 @@
+[
+  {
+    "path": "/api/dynamic/hello",
+    "method": "GET",
+    "response": "Hello from dynamic controller!"
+  },
+  {
+    "path": "/api/dynamic/user",
+    "method": "POST",
+    "response": {"id": 1, "name": "Dynamic User"}
+  }
+]
