@@ -17,3 +17,12 @@ mybatis:
   # 开启驼峰命名映射（user_name → userName）
   configuration:
     map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+logging:
+  level:
+    com:
+      example:
+        mapper: DEBUG
+    jdbc:
+      sqlonly: DEBUG
