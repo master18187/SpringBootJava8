@@ -25,6 +25,7 @@
 	<modules>
 		<module>demo-common</module>
 		<module>demo-case</module>
+		<module>demo-job</module>
 	</modules>
 	<scm>
 		<connection />
