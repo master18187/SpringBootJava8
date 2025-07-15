@@ -5,14 +5,14 @@ import okhttp3.Response;
 
 import java.io.IOException;
 
-public class OAuth2Client<Req extends HttpRequestBean, Resp extends HttpResponseBean>
+public abstract class OAuth2Client<Req extends HttpRequestBean, Resp extends HttpResponseBean>
         extends BaseClient<Req, Resp> {
 
-    private final String clientId;
-    private final String clientSecret;
-    private final String redirectUri;
-    private final String authUrl;
-    private final String tokenUrl;
+    protected String clientId;
+    protected String clientSecret;
+    protected String redirectUri;
+    protected String authUrl;
+    protected String tokenUrl;
 
     public OAuth2Client(String clientId, String clientSecret, String redirectUri,
                         String authUrl, String tokenUrl) {
