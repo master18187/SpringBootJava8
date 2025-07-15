@@ -1,4 +1,4 @@
-package com.example.shopee;
+package com.example.api;
 
 import lombok.Data;
 
