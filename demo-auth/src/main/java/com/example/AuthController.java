@@ -15,7 +15,7 @@ import java.util.Map;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @PostMapping("/login")
+    @RequestMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request) {
         Map<String, Object> result = new HashMap<>();
 
@@ -42,13 +42,13 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/logout")
+    @RequestMapping("/logout")
     public ResponseEntity<String> logout() {
         SecurityUtils.getSubject().logout();
         return ResponseEntity.ok("退出成功");
     }
 
-    @GetMapping("/unauthorized")
+    @RequestMapping("/unauthorized")
     public ResponseEntity<String> unauthorized() {
         return ResponseEntity.status(403).body("没有访问权限");
     }
