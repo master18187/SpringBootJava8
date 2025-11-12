@@ -33,7 +33,7 @@ public class UserRealm extends AuthorizingRealm {
         return authorizationInfo;
     }
 
-    /**
+/**
      * 认证逻辑：验证用户身份
      */
     @Override
@@ -42,22 +42,27 @@ public class UserRealm extends AuthorizingRealm {
 
         UsernamePasswordToken upToken = (UsernamePasswordToken) token;
         String username = upToken.getUsername();
-        String password = new String(upToken.getPassword());
 
         // 1. 查询用户信息
+        UserService.User user = userService.findByUsername(username);
+        if (user == null) {
+            throw new UnknownAccountException("用户不存在");
+        }
 
+        // 2. 检查账户状态
+        if (!user.isEnabled()) {
+            throw new DisabledAccountException("账户已被禁用");
+        }
 
-        // 2. 验证密码（实际项目中密码应该加密）
+        if (user.isLocked()) {
+            throw new LockedAccountException("账户已被锁定");
+        }
 
-
-        // 3. 检查账户状态
-
-
-        // 4. 返回认证信息
+        // 3. 返回认证信息（密码验证由Shiro的CredentialsMatcher处理）
         return new SimpleAuthenticationInfo(
-                null,      //  principal
-                null,      //  credentials
-                getName()                //  realmName
+                username,               // principal：用户名
+                user.getPassword(),     // credentials：密码（加密后的）
+                getName()               // realmName
         );
     }
 }

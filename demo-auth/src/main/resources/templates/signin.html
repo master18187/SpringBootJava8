@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多方式登录系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: linear-gradient(to right, #4a6ee0, #6a11cb);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .login-header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .login-tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px 10px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #4a6ee0;
+            border-bottom: 3px solid #4a6ee0;
+        }
+
+        .tab-content {
+            padding: 25px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #4a6ee0;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 110, 224, 0.2);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .input-with-icon .form-control {
+            padding-left: 45px;
+        }
+
+        .captcha-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .captcha-input {
+            flex: 1;
+        }
+
+        .captcha-img {
+            height: 46px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 18px;
+            letter-spacing: 5px;
+            color: #333;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #4a6ee0, #6a11cb);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 110, 224, 0.4);
+        }
+
+        .btn-send-code {
+            background-color: #f0f2f5;
+            color: #4a6ee0;
+            border: 1px solid #ddd;
+            white-space: nowrap;
+            padding: 12px 15px;
+        }
+
+        .btn-send-code:disabled {
+            background-color: #f0f2f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .social-login {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .social-login p {
+            position: relative;
+            margin-bottom: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .social-login p:before,
+        .social-login p:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background-color: #eee;
+        }
+
+        .social-login p:before {
+            left: 0;
+        }
+
+        .social-login p:after {
+            right: 0;
+        }
+
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-wechat {
+            background: linear-gradient(to right, #09bb07, #09bb07);
+        }
+
+        .btn-alipay {
+            background: linear-gradient(to right, #1677ff, #1677ff);
+        }
+
+        .qrcode-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .qrcode {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 15px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: #4a6ee0;
+        }
+
+        .qrcode-desc {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer-links {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .footer-links a {
+            color: #4a6ee0;
+            text-decoration: none;
+            font-size: 14px;
+            margin: 0 10px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .countdown {
+            color: #999;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                border-radius: 10px;
+            }
+
+            .login-header {
+                padding: 20px 15px;
+            }
+
+            .tab-content {
+                padding: 20px 15px;
+            }
+
+            .captcha-container {
+                flex-direction: column;
+            }
+
+            .captcha-img {
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-header">
+        <h1>欢迎登录</h1>
+        <p>请选择您的登录方式</p>
+    </div>
+
+    <div class="login-tabs">
+        <div class="tab active" data-tab="password">账号密码</div>
+        <div class="tab" data-tab="sms">手机验证码</div>
+        <div class="tab" data-tab="wechat">微信登录</div>
+        <div class="tab" data-tab="alipay">支付宝登录</div>
+    </div>
+
+    <div class="tab-content">
+        <!-- 账号密码登录 -->
+        <div class="tab-pane active" id="password-tab">
+            <form id="password-form" th:action="@{/login}" method="post">
+                <div class="form-group">
+                    <label for="username">用户名/手机号/邮箱</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="请输入用户名、手机号或邮箱" required>
+                    </div>
+                    <div class="error-message" id="username-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码" required>
+                    </div>
+                    <div class="error-message" id="password-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="captcha">验证码</label>
+                    <div class="captcha-container">
+                        <div class="captcha-input">
+                            <input type="text" class="form-control" id="captcha" name="captcha" placeholder="请输入验证码" maxlength="4" required>
+                        </div>
+                        <div class="captcha-img" id="captcha-img">
+                            AB12
+                        </div>
+                    </div>
+                    <div class="error-message" id="captcha-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">登录</button>
+                </div>
+            </form>
+
+            <div class="social-login">
+                <p>或使用以下方式登录</p>
+                <div class="social-buttons">
+                    <div class="social-btn btn-wechat" onclick="switchTab('wechat')">
+                        <i class="fab fa-weixin"></i>
+                    </div>
+                    <div class="social-btn btn-alipay" onclick="switchTab('alipay')">
+                        <i class="fab fa-alipay"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 手机验证码登录 -->
+        <div class="tab-pane" id="sms-tab">
+            <form id="sms-form">
+                <div class="form-group">
+                    <label for="phone">手机号码</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="请输入手机号码" required>
+                    </div>
+                    <div class="error-message" id="phone-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sms-code">短信验证码</label>
+                    <div class="captcha-container">
+                        <div class="captcha-input">
+                            <input type="text" class="form-control" id="sms-code" name="smsCode" placeholder="请输入6位验证码" maxlength="6" required>
+                        </div>
+                        <button type="button" class="btn btn-send-code" id="send-sms-btn">发送验证码</button>
+                    </div>
+                    <div class="error-message" id="sms-code-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">登录</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 微信扫码登录 -->
+        <div class="tab-pane" id="wechat-tab">
+            <div class="qrcode-container">
+                <div class="qrcode">
+                    <i class="fab fa-weixin"></i>
+                </div>
+                <p class="qrcode-desc">请使用微信扫一扫二维码登录</p>
+            </div>
+
+            <div class="social-login">
+                <p>其他登录方式</p>
+                <div class="social-buttons">
+                    <div class="social-btn" style="background: linear-gradient(to right, #4a6ee0, #6a11cb);" onclick="switchTab('password')">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="social-btn btn-alipay" onclick="switchTab('alipay')">
+                        <i class="fab fa-alipay"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 支付宝扫码登录 -->
+        <div class="tab-pane" id="alipay-tab">
+            <div class="qrcode-container">
+                <div class="qrcode">
+                    <i class="fab fa-alipay"></i>
+                </div>
+                <p class="qrcode-desc">请使用支付宝扫一扫二维码登录</p>
+            </div>
+
+            <div class="social-login">
+                <p>其他登录方式</p>
+                <div class="social-buttons">
+                    <div class="social-btn" style="background: linear-gradient(to right, #4a6ee0, #6a11cb);" onclick="switchTab('password')">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="social-btn btn-wechat" onclick="switchTab('wechat')">
+                        <i class="fab fa-weixin"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-links">
+        <a href="#">忘记密码</a>
+        <a href="#">注册账号</a>
+        <a href="#">帮助中心</a>
+    </div>
+</div>
+
+<script>
+    // 切换选项卡
+    function switchTab(tabName) {
+        // 更新选项卡状态
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.dataset.tab === tabName) {
+                tab.classList.add('active');
+            }
+        });
+
+        // 更新内容区域
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.remove('active');
+            if (pane.id === `${tabName}-tab`) {
+                pane.classList.add('active');
+            }
+        });
+    }
+
+    // 为选项卡添加点击事件
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            switchTab(this.dataset.tab);
+        });
+    });
+
+    // 生成随机验证码
+    function generateCaptcha() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let captcha = '';
+        for (let i = 0; i < 4; i++) {
+            captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return captcha;
+    }
+
+    // 更新验证码显示
+    function updateCaptcha() {
+        const captchaImg = document.getElementById('captcha-img');
+        const newCaptcha = generateCaptcha();
+        captchaImg.textContent = newCaptcha;
+    }
+
+    // 初始化验证码
+    updateCaptcha();
+
+    // 点击验证码刷新
+    document.getElementById('captcha-img').addEventListener('click', updateCaptcha);
+
+    // 发送短信验证码
+    let countdown = 0;
+    document.getElementById('send-sms-btn').addEventListener('click', function() {
+        const phoneInput = document.getElementById('phone');
+        const phone = phoneInput.value.trim();
+        const phoneError = document.getElementById('phone-error');
+
+        // 简单的手机号验证
+        const phoneRegex = /^1[3-9]\d{9}$/;
+        if (!phoneRegex.test(phone)) {
+            phoneError.textContent = '请输入正确的手机号码';
+            phoneError.style.display = 'block';
+            return;
+        }
+
+        phoneError.style.display = 'none';
+
+        // 开始倒计时
+        if (countdown === 0) {
+            countdown = 60;
+            const btn = this;
+            btn.disabled = true;
+
+            const timer = setInterval(function() {
+                if (countdown > 0) {
+                    btn.innerHTML = `<span class="countdown">${countdown}秒后重新发送</span>`;
+                    countdown--;
+                } else {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.innerHTML = '发送验证码';
+                }
+            }, 1000);
+
+            // 这里应该调用后端API发送短信
+            alert(`验证码已发送到 ${phone}，实际项目中这里会调用短信API`);
+        }
+    });
+
+    // 表单验证和提交
+    document.getElementById('password-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const captcha = document.getElementById('captcha').value.trim();
+
+        let isValid = true;
+
+        // 验证用户名
+        if (username === '') {
+            document.getElementById('username-error').textContent = '请输入用户名';
+            document.getElementById('username-error').style.display = 'block';
+            isValid = false;
+        } else {
+            document.getElementById('username-error').style.display = 'none';
+        }
+
+        // 验证密码
+        if (password === '') {
+            document.getElementById('password-error').textContent = '请输入密码';
+            document.getElementById('password-error').style.display = 'block';
+            isValid = false;
+        } else {
+            document.getElementById('password-error').style.display = 'none';
+        }
+
+        // 验证验证码
+        if (captcha === '') {
+            document.getElementById('captcha-error').textContent = '请输入验证码';
+            document.getElementById('captcha-error').style.display = 'block';
+            isValid = false;
+        } else if (captcha.length !== 4) {
+            document.getElementById('captcha-error').textContent = '验证码必须为4位';
+            document.getElementById('captcha-error').style.display = 'block';
+            isValid = false;
+        } else {
+            document.getElementById('captcha-error').style.display = 'none';
+        }
+
+        if (isValid) {
+            // 在实际项目中，这里应该提交表单到后端
+            alert('登录请求已提交，实际项目中这里会提交到后端验证');
+            // this.submit(); // 取消注释以实际提交表单
+        }
+    });
+
+    // 手机验证码登录表单提交
+    document.getElementById('sms-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const phone = document.getElementById('phone').value.trim();
+        const smsCode = document.getElementById('sms-code').value.trim();
+
+        let isValid = true;
+
+        // 验证手机号
+        const phoneRegex = /^1[3-9]\d{9}$/;
+        if (!phoneRegex.test(phone)) {
+            document.getElementById('phone-error').textContent = '请输入正确的手机号码';
+            document.getElementById('phone-error').style.display = 'block';
+            isValid = false;
+        } else {
+            document.getElementById('phone-error').style.display = 'none';
+        }
+
+        // 验证短信验证码
+        if (smsCode === '') {
+            document.getElementById('sms-code-error').textContent = '请输入短信验证码';
+            document.getElementById('sms-code-error').style.display = 'block';
+            isValid = false;
+        } else if (smsCode.length !== 6) {
+            document.getElementById('sms-code-error').textContent = '验证码必须为6位';
+            document.getElementById('sms-code-error').style.display = 'block';
+            isValid = false;
+        } else {
+            document.getElementById('sms-code-error').style.display = 'none';
+        }
+
+        if (isValid) {
+            // 在实际项目中，这里应该提交表单到后端
+            alert('手机验证码登录请求已提交，实际项目中这里会提交到后端验证');
+        }
+    });
+</script>
+</body>
+</html>
